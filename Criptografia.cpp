@@ -4,10 +4,11 @@
 #include <algorithm>
 
 Criptografia::Criptografia()
-    : groupA{'O', '9', 'U', 'P', '0', 'V', 'Y', 'J', '4', '!'},
-        groupB{'X', '?', '7', 'G', 'M', '2', 'E', 'S', 'Z', 'C'},
-        groupC{'A', 'D', 'L', 'W', '8', 'B', '6', ',', '5', 'F'},
-        groupD{'Q', 'R', '1', 'K', 'N', 'T', 'H', '.', 'I', '3'} 
+    : groupA{'O', '9', 'U', 'P', '0', 'V', '$', 'Y', 'J', '4', '!'},
+        groupB{'X', '?', '7', 'G', 'M', '2', 'E', ':', 'S', 'Z', 'C'},
+        groupC{'A', 'D', '@', 'L', 'W', '8', 'B', '6', ',', '5', 'F'},
+        groupD{'Q', 'R', '1', 'K', 'N', '\'', 'T', 'H', '.', 'I', '3'},
+        groupSize{11}
 {}
 
 void Criptografia::imprimirGrupos() {
@@ -29,69 +30,98 @@ void Criptografia::imprimirGrupos() {
     std::cout << std::endl;
 }
 
-std::string Criptografia::encrypt(const std::string& word, unsigned int rot) {
+std::string Criptografia::encrypt(const std::string& message) {
 
-    std::string encrypted_word;
+    std::string encrypted_message;
+    unsigned int char_idx{0}, rot;
+    bool next_char{true};
 
-    for (char c: word) {
+    for (char c: message) {
         
         std::vector<char>::iterator it;
         int index;
+        
+        rot = char_idx % this->groupSize;
+        if (rot == 0) {
+            if (next_char) {
+                rot = 1;
+                next_char = !next_char;
+            } else {
+                rot = this->groupSize - 1;
+                next_char = !next_char;
+            }
+        }
 
         if ((it = std::find(this->groupA.begin(), this->groupA.end(), c)) != this->groupA.end())
-            encrypted_word += this->groupA[(std::distance(this->groupA.begin(), it) + rot) % this->groupA.size()];
+            encrypted_message += this->groupA[(std::distance(this->groupA.begin(), it) + rot) % this->groupSize];
         else if ((it = std::find(this->groupB.begin(), this->groupB.end(), c)) != this->groupB.end()) {
              if ((index = (std::distance(this->groupB.begin(), it) - rot)) < 0)
-                encrypted_word += this->groupB[this->groupB.size() + index];
+                encrypted_message += this->groupB[this->groupSize + index];
             else
-                encrypted_word += this->groupB[index];
+                encrypted_message += this->groupB[index];
         }
         else if ((it = std::find(this->groupC.begin(), this->groupC.end(), c)) != this->groupC.end())
-            encrypted_word += this->groupC[(std::distance(this->groupC.begin(), it) + rot) % this->groupC.size()];
+            encrypted_message += this->groupC[(std::distance(this->groupC.begin(), it) + rot) % this->groupSize];
         else if ((it = std::find(this->groupD.begin(), this->groupD.end(), c)) != this->groupD.end()) {
             if ((index = (std::distance(this->groupD.begin(), it) - rot)) < 0)
-                encrypted_word += this->groupD[this->groupD.size() + index];
+                encrypted_message += this->groupD[this->groupSize + index];
             else
-                encrypted_word += this->groupD[index];
+                encrypted_message += this->groupD[index];
         }
         else
-            encrypted_word += c;
-            
+            encrypted_message += c;
+
+        char_idx++;
     }
 
-    return encrypted_word;
+    return encrypted_message;
 
 }                            
 
-std::string Criptografia::decrypt(const std::string& word, unsigned int rot) {
+std::string Criptografia::decrypt(const std::string& message) {
 
-    std::string decrypted_word;
+    std::string decrypted_message;
+    unsigned int char_idx{0}, rot;
+    bool next_char{true};
 
-    for (char c: word) {
+    for (char c: message) {
         
-        std::vector<char>::iterator it;
+       std::vector<char>::iterator it;
         int index;
+        
+        rot = char_idx % this->groupSize;
+        if (rot == 0) {
+            if (next_char) {
+                rot = 1;
+                next_char = !next_char;
+            } else {
+                rot = this->groupSize - 1;
+                next_char = !next_char;
+            }
+        }
 
         if ((it = std::find(this->groupA.begin(), this->groupA.end(), c)) != this->groupA.end()) {
             if ((index = (std::distance(this->groupA.begin(), it) - rot)) < 0)
-                decrypted_word += this->groupA[this->groupA.size() + index];
+                decrypted_message += this->groupA[this->groupSize + index];
             else
-                decrypted_word += this->groupA[index];
+                decrypted_message += this->groupA[index];
         }
         else if ((it = std::find(this->groupB.begin(), this->groupB.end(), c)) != this->groupB.end())
-            decrypted_word += this->groupB[(std::distance(this->groupB.begin(), it) + rot) % this->groupB.size()];
+            decrypted_message += this->groupB[(std::distance(this->groupB.begin(), it) + rot) % this->groupSize];
         else if ((it = std::find(this->groupC.begin(), this->groupC.end(), c)) != this->groupC.end()) {
             if ((index = (std::distance(this->groupC.begin(), it) - rot)) < 0)
-                decrypted_word += this->groupC[this->groupC.size() + index];
+                decrypted_message += this->groupC[this->groupSize + index];
             else
-                decrypted_word += this->groupC[index];
+                decrypted_message += this->groupC[index];
         }   
         else if ((it = std::find(this->groupD.begin(), this->groupD.end(), c)) != this->groupD.end())
-            decrypted_word += this->groupD[(std::distance(this->groupD.begin(), it) + rot) % this->groupD.size()];
+            decrypted_message += this->groupD[(std::distance(this->groupD.begin(), it) + rot) % this->groupSize];
         else
-            decrypted_word += c;
+            decrypted_message += c;
+
+        char_idx++;
     }
 
-    return decrypted_word;
+    return decrypted_message;
 
 }                   
