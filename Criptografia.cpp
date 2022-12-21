@@ -5,7 +5,7 @@
 
 Criptografia::Criptografia()
     : groupA{'O', '9', 'U', 'P', '0', 'V', '$', 'Y', 'J', '4', '!'},
-        groupB{'X', '?', '7', 'G', 'M', '2', 'E', ':', 'S', 'Z', 'C'},
+        groupB{'X', '?', '7', 'G', 'M', '2', 'E', '#', 'S', 'Z', 'C'},
         groupC{'A', 'D', '@', 'L', 'W', '8', 'B', '6', ',', '5', 'F'},
         groupD{'Q', 'R', '1', 'K', 'N', '\'', 'T', 'H', '.', 'I', '3'},
         groupSize{11}
@@ -55,7 +55,7 @@ std::string Criptografia::encrypt(const std::string& message) {
         if ((it = std::find(this->groupA.begin(), this->groupA.end(), c)) != this->groupA.end())
             encrypted_message += this->groupA[(std::distance(this->groupA.begin(), it) + rot) % this->groupSize];
         else if ((it = std::find(this->groupB.begin(), this->groupB.end(), c)) != this->groupB.end()) {
-             if ((index = (std::distance(this->groupB.begin(), it) - rot)) < 0)
+            if ((index = (std::distance(this->groupB.begin(), it) - rot)) < 0)
                 encrypted_message += this->groupB[this->groupSize + index];
             else
                 encrypted_message += this->groupB[index];
