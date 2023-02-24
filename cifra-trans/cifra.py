@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 
 upside_down = str.maketrans('abcdefghijklmnopqrstuvwxyz',
