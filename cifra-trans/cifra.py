@@ -1,36 +1,25 @@
 #!/usr/bin/env python3
 
+# Luan Machado Bernardt | GRR20190363
+# Lucas Soni Teixeira   | GRR20190395
+
 import sys
 
-upside_down = str.maketrans('abcdefghijklmnopqrstuvwxyz',
-                            '\u0250q\u0254p\u01DD\u025F\u0183\u0265\u0131\u027E\u029E\u05DF\u026Fuodb\u0279s\u0287n\u028C\u028Dx\u028Ez')
-
-upside_up = str.maketrans('\u0250q\u0254p\u01DD\u025F\u0183\u0265\u0131\u027E\u029E\u05DF\u026Fuodb\u0279s\u0287n\u028C\u028Dx\u028Ez',
-                            'abcdefghijklmnopqrstuvwxyz')
-
-
 def flip_text(text):
+    upside_down = str.maketrans('abcdefghijklmnopqrstuvwxyz',
+                            '\u0250q\u0254p\u01DD\u025F\u0183\u0265\u0131\u027E\u029El\u026Fuodb\u0279s\u0287n\u028C\u028Dx\u028Ez')
     return text.translate(upside_down)[::-1]
 
 def unflip_text(text):
+    upside_up = str.maketrans('\u0250q\u0254p\u01DD\u025F\u0183\u0265\u0131\u027E\u029El\u026Fuodb\u0279s\u0287n\u028C\u028Dx\u028Ez',
+                            'abcdefghijklmnopqrstuvwxyz')
     return text.translate(upside_up)[::-1]
-
-text = ""
-
-for line in sys.stdin:
-    words = line.split()
-
-    for word in words:
-        text += word.lower()
-
-text = unflip_text(text)
 
 def encryptRailFence(text, key):
  
     rail = [[' ' for i in range(len(text))]
                 for j in range(key)]
      
-    # to find the direction
     dir_down = False
     row, col = 0, 0
      
@@ -88,37 +77,74 @@ def decryptRailFence(cipher, key):
     row, col = 0, 0
     for i in range(len(cipher)):
          
-        # check the direction of flow
         if row == 0:
             dir_down = True
         if row == key-1:
             dir_down = False
              
-        # place the marker
         if (rail[row][col] != '*'):
             result.append(rail[row][col])
             col += 1
              
-        # find the next row using
-        # direction flag
         if dir_down:
             row += 1
         else:
             row -= 1
     return("".join(result))
 
+''' Main '''
+
+decode = False
+
+if len(sys.argv) > 1 and sys.argv[1] == "-d":
+    decode = True
+
+text = ""
+
+for line in sys.stdin:
+    words = line.split()
+
+    for word in words:
+        text += word.lower()
+
+if decode == True:
+    text = unflip_text(text)
+
 substr = ""
 n = len(text) // 100
 index = 0
+rail_value = 3
+increasing_value = -1
 
 ciphered_text = ""
 
-for i in range(n):
-    substr = text[i*100: (i*100 + 100)]
-    ciphered_text += decryptRailFence(substr, 3)
-    index += 1
+if decode == True:
+    for i in range(n):
+        substr = text[i*100: (i*100 + 100)]
+
+        ciphered_text += decryptRailFence(substr, rail_value)
+
+        index += 1
+        increasing_value  *= -1
+        rail_value += increasing_value
+else:
+    for i in range(n):
+        substr = text[i*100: (i*100 + 100)]
+
+        ciphered_text += encryptRailFence(substr, rail_value)
+
+        index += 1
+        increasing_value  *= -1
+        rail_value += increasing_value
 
 substr = text[index*100: (index*100 + (len(text) % 100))]
-ciphered_text += decryptRailFence(substr, 3)
+
+if decode == True:
+    ciphered_text += decryptRailFence(substr, rail_value)
+else:
+    ciphered_text += encryptRailFence(substr, rail_value)
+
+if decode == False:
+    ciphered_text = flip_text(ciphered_text)
 
 print(ciphered_text)
