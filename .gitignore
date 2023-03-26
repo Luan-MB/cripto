@@ -1,3 +1,5 @@
 GRR20190363-GRR20190395/
 main
-*.py
+cifra
+*.txt
+*.tar.gz
